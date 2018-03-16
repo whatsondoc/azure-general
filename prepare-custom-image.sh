@@ -48,7 +48,7 @@ az vm generalize --resource-group $AZURERG --name $AZUREVM
 
 sleep 2
 
-LOCATION=$(az group show --resource-group bhw-hpc | grep location | awk '{print $2 $3}' | sed 's/.$//' | sed 's/"//g')
+LOCATION=$(az group show --resource-group $AZURERG | grep location | awk '{print $2 $3}' | sed 's/.$//' | sed 's/"//g')
 AZUREIMAGE=$AZUREVM-image
 az image create --resource-group $AZURERG --name $AZUREIMAGE --source $AZUREVM --location $LOCATION 
 
