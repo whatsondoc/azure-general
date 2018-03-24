@@ -1,5 +1,13 @@
 #!/bin/bash
 
+# Authors: Steve Roach & Ben Watson
+
+############# WARNING ############ WARNING ############ WARNING ############ WARNING ##############
+### THIS IS A DESTRUCTIVE SCRIPT -- STUFF _WILL_ BE PERMANENTLY DELETED AFTER RUNNING THIS SCRIPT #
+### PLEASE TRIPLE CHECK YOU ACTUALLY WANT TO DELETE THIS STUFF ***BEFORE*** HITTING 'ENTER' BELOW #
+###              (THERE IS A SAFEGUARD SECTION BEFORE THE DELETION STEPS OCCUR)                   #
+###################################################################################################
+
 if command -v az > /dev/null
 then
 
