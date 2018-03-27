@@ -2,22 +2,30 @@
 
 if command -v az > /dev/null
 then
-	read -p "Enter the name of the VM that we will be adding the managed disks to: " vmname
-	read -p "Enter the name of the Resource Group in which the VM exists: " rg
-	read -p "Enter the size in GB of each managed disk: " size
-	read -p "Specify the storage type for these managed disks (Standard_LRS or Premium_LRS): " type
-	read -p "How many managed data disks shall we add as part of this operation? Note the max number of disks per VM: " upper
+	echo -e "\n:::Adding managed data disks to an Azure VM:::\n"
+	date
+	echo ""
 
-	lower=0
-	let disknum=$upper-1
+	read -p "Enter the name of the VM that we will be adding the managed disks to: " VMNAME
+	read -p "Enter the name of the Resource Group in which the VM exists: " RGRP
+	echo ""
+	read -p "Enter the size in GB of each managed disk: " SIZE
+	read -p "Specify the storage type for these managed disks (Standard_LRS or Premium_LRS): " SKU
+	read -p "How many managed data disks shall we add as part of this operation? Note the max number of disks per VM: " UPPER
+	read -p "What LUN should we start at: " LUNSTART
 
-	for i in $(seq $lower $disknum)
+	let DISKNUM=$(( ($LUNSTART + $UPPER) - 1 ))
+
+	for i in $(seq $LUNSTART $DISKNUM)
 	do
-		az vm disk attach --resource-group $rg --vm-name $vmname --disk $vmname-datadisk-$i --new --size $size --sku $type -lun $i		
-		echo -e "\n\nThe VM now has these disks attached:\n" 
-		az vm show --resource-group $rg --vm-name $vmname | grep diskSize
+		az vm disk attach --resource-group $RGRP --vm-name $VMNAME --disk $VMNAME-datadisk-$i --new --size-gb $SIZE --sku $SKU --lun $i		
 	done
+
+echo -e "\n\nThe VM now has these disks attached:\n" 
+az vm show --resource-group $RGRP --name $VMNAME --query "storageProfile.dataDisks[*].managedDisk.id" -o tsv
+echo -e "\n"
+
 else
-	echo -e "This is a script that will run using the Azure CLI - it does not look as though this is installed.\n\nExiting...\n"
+	echo -e "\nThis is a script that will run using the Azure CLI - it does not look as though this is installed.\n\nExiting...\n"
 	exit
 fi
