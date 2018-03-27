@@ -28,7 +28,8 @@ echo -e "\n"
 read -p "Enter the VM name: " VMName
 read -p "Enter the Resource Group name: " RGName
 
-OUTPUT=./$VMName-deletion.tmp
+OUTPUT="$VMName-deletion.tmp"
+find . -name "$OUTPUT.*" -exec rm {} \;
 
 echo -e "\nThese are the resources being deleted: \n"
 
@@ -49,7 +50,6 @@ then
 		DATADISK[$i]=$(echo ${DATADISKS[$i]})
 		echo ${DATADISKS[$i]} >> $OUTPUT.DATADISK
 	done
-cat $OUTPUT.DATADISK
 fi
 
 # Identifying any NICs:
@@ -75,17 +75,21 @@ then
 			echo ${PIP[$j]} >> $OUTPUT.PIP
 		fi
 	done
-
-if [ -f $OUTPUT.NIC ]; then cat $OUTPUT.NIC; fi
-if [ -f $OUTPUT.NSG ]; then cat $OUTPUT.NSG; fi
-if [ -f $OUTPUT.PIP ]; then cat $OUTPUT.PIP; fi
-
 fi
+
+find . -name "$OUTPUT.*" -exec cat {} \;
 
 # Preparing for deletion:
 
 echo -e "\n"
-read -p "Please press enter to continue with this operation >>>"
+read -p "Please type DELETE as confirmation to continue with this operation: " decision
+case "$decision" in
+	DELETE|delete ) ;;
+	* ) echo -e "\nAn explicit confirmation was not detected. 
+
+...This script is exiting...\n"; exit;;
+esac
+
 echo -e "\n"
 
 # Deleting the VM:
