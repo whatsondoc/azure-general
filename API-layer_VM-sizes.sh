@@ -40,7 +40,7 @@ then
 		az account list-locations | grep name | awk '{print $2 $3}' | sed 's/.$//' | sed 's/"//g' | grep -w $REGION > /dev/null
 	then
 		echo -e "\nCapturing details from $REGION for all VM SKUs...\n"
-        	echo "----------------------------" >> $OUTPUT; date >> $OUTPUT; echo "----------------------------" >> $OUTPUT
+        	echo "----------------------------" >> $OUTPUT; date >> $OUTPUT; echo -e "----------------------------\n" >> $OUTPUT
 		az vm list-sizes --location $REGION --output table >> $OUTPUT
 		echo -e "\n<--COMPLETED-->\n"
 		echo -e "\nThe output has been recorded here: $OUTPUT\n"
@@ -57,7 +57,10 @@ if [ -z $REGION ]
 then
 	OUTPUT=$OUTPUT.ALLREGIONS.$VMSKU
         echo -e "\nCapturing details from all regions for the VM SKU: $VMSKU \n"
-        echo "----------------------------" >> $OUTPUT; date >> $OUTPUT; echo "----------------------------" >> $OUTPUT
+        echo "----------------------------" >> $OUTPUT; date >> $OUTPUT; echo -e "----------------------------\n" >> $OUTPUT
+	echo "
+MaxDataDiskCount    MemoryInMb    Name                    NumberOfCores    OsDiskSizeInMb    ResourceDiskSizeInMb
+------------------  ------------  ----------------------  ---------------  ----------------  ----------------------" >> $OUTPUT
         for i in $(az account list-locations | grep name | awk '{print $2 $3}' | sed 's/.$//' | sed 's/"//g')
         do
                 echo -e "\nSTART: $i\n" >> $OUTPUT
@@ -74,7 +77,10 @@ then
                 az account list-locations | grep name | awk '{print $2 $3}' | sed 's/.$//' | sed 's/"//g' | grep -w $REGION > /dev/null
         then
                 echo -e "\nCapturing details from $REGION for the VM SKU: $VMSKU \n"
-                echo "----------------------------" >> $OUTPUT; date >> $OUTPUT; echo "----------------------------" >> $OUTPUT
+                echo "----------------------------" >> $OUTPUT; date >> $OUTPUT; echo -e "----------------------------\n" >> $OUTPUT
+		echo "
+MaxDataDiskCount    MemoryInMb    Name                    NumberOfCores    OsDiskSizeInMb    ResourceDiskSizeInMb
+------------------  ------------  ----------------------  ---------------  ----------------  ----------------------" >> $OUTPUT
                 az vm list-sizes --location $REGION --output table | grep $VMSKU >> $OUTPUT
                 echo -e "\n<--COMPLETED-->\n"
                 echo -e "\nThe output has been recorded here: `echo $OUTPUT`\n"
