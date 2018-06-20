@@ -1,27 +1,49 @@
 #!/bin/bash
 set -e 
 
-#### Script syntax: ./downloadupload.sh <SOURCE_STORAGE_ACCOUNT_NAME> <TARGET_STORAGE_ACCOUNT_NAME>
+## Functions:
 
-SOURCESA=$1
-TARGETSA=$2
+BRK() { 
+    echo -e "\n\n" 
+}
+PRINT_HELP() { 
+    echo -e "Script syntax: ./downloadupload.sh <SOURCE_STORAGE_ACCOUNT_NAME> <TARGET_STORAGE_ACCOUNT_NAME> \n\nFor example: $ ./downloadupload.sh -s northstorage -t weststorage" 
+}
 
+BRK
+
+SOURCESA=''
+TARGETSA=''
+
+if [ $# != 4 ]
+then 
+    echo -e "Incorrect number of parameter inputs were provided:\n\nPlease re-run the script and specify the source ('-s') & target ('-t') storage accounts\n\n"
+    exit 1
+fi
+
+while getopts 's:t:' flag
+do
+    case "${flag}" in
+        s | --source)   SOURCESA=$OPTARG ;;
+        t | --target)   TARGETSA=$OPTARG ;;
+        h | --help)     print_help
+                        exit 1 ;;
+	esac
+done
 
 ## Capturing required binaries:
 
 if ! command -v az > /dev/null
-then echo -e "The Azure CLI is required for this script to run, and it is not installed (or not in $PATH)\n\n"; exit 1
+then 
+    echo -e '\nThe Azure CLI is required for this script to run, and it is not installed (or not in $PATH)\n\n'
+    exit 1
 fi
 
 if ! command -v azcopy > /dev/null
-then echo -e "AzCopy is not installed on this local machine (or is not in $PATH), and is needed for this script to function\n\n"; exit 1
+then 
+    echo -e '\nAzCopy is not installed on this local machine (or is not in $PATH), and is needed for this script to function\n\n'
+    exit 1
 fi 
-
-## Functions:
-
-BRK() {
-    echo -e "\n\n"
-}
 
 
 ## Script body:
@@ -59,13 +81,12 @@ mkdir ${DULOGS}
 for i in ${CONTAINERS[*]}
 do
     mkdir ${DOWNLOAD_UPLOAD_DIR}/$i
-    azcopy --source https://${AZURE_STORAGE_ACCOUNT}.blob.core.windows.net/$i --destination ${DOWNLOAD_UPLOAD_DIR}/$i --source-key ${AZURE_STORAGE_KEY} --resume ${DULOGS}/journal-down-$i --recursive >> $DULOGS/$i.azcopy.download.log &
+    azcopy --source "https://${AZURE_STORAGE_ACCOUNT}.blob.core.windows.net/$i" --destination ${DOWNLOAD_UPLOAD_DIR}/$i --source-key ${AZURE_STORAGE_KEY} --resume ${DULOGS}/journal-down-$i --recursive >> $DULOGS/$i.azcopy.download.log &
 done
 
 # Allowing some time for the AzCopy processes to download some data
-echo "Downloads initiated - sleeping"
+echo -e "Downloads initiated --- sleeping...\n"
 sleep 60
-echo -e "\nAwakened - uploads starting..."
 
 # Uploading the downloaded data from the source storage account to the new storage account:  
 for q in $(ls ${DOWNLOAD_UPLOAD_DIR})
@@ -73,3 +94,7 @@ do
     az storage container create --name $q --public-access off --fail-on-exist --account-name ${TARGET_AZURE_STORAGE_ACCOUNT} --account-key ${TARGET_AZURE_STORAGE_KEY} >> ${DULOGS}/container-creation.log
     azcopy --source ${DOWNLOAD_UPLOAD_DIR}/$q --destination "https://${TARGET_AZURE_STORAGE_ACCOUNT}.blob.core.windows.net/$q" --dest-key ${TARGET_AZURE_STORAGE_KEY} --blob-type block --resume ${DULOGS}/journal-up-$q --recursive >> $DULOGS/$q.azcopy.upload.log &
 done
+
+echo -e "Awakened --- uploads initiated...\n\nAzCopy processes:\n`ps ax | grep -i azcopy`"
+
+BRK
