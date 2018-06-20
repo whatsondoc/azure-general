@@ -6,26 +6,6 @@ set -e
 SOURCESA=$1
 TARGETSA=$2
 
-#while getopts "s:t:" opt; do
-#	case "$opt" in
-#	s)	SOURCESA=$OPTARG
-#		;;
-#	t)	TARGETSA=$OPTARG
-#		;;
-#    esac
-#done
-
-#if [[ -z ${SOURCESA} ]]
-#then
-#    echo -e "No source Storage Account ('-s') specified, can't proceed.\n\n"
-#    exit 1
-#fi
-
-#if [[ -z ${TARGETSA} ]] 
-#then
-#    echo -e "No target Storage Account ('-t') specified, can't proceed.\n\n"
-#    exit 1
-#fi
 
 ## Capturing required binaries:
 
