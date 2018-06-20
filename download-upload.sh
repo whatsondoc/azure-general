@@ -6,9 +6,6 @@ set -e
 BRK() { 
     echo -e "\n\n" 
 }
-PRINT_HELP() { 
-    echo -e "Script syntax: ./downloadupload.sh <SOURCE_STORAGE_ACCOUNT_NAME> <TARGET_STORAGE_ACCOUNT_NAME> \n\nFor example: $ ./downloadupload.sh -s northstorage -t weststorage" 
-}
 
 BRK
 
@@ -17,7 +14,7 @@ TARGETSA=''
 
 if [ $# != 4 ]
 then 
-    echo -e "Incorrect number of parameter inputs were provided:\n\nPlease re-run the script and specify the source ('-s') & target ('-t') storage accounts\n\n"
+    echo -e "Incorrect number of parameter inputs were provided: Please re-run the script and specify the source ('-s') & target ('-t') storage accounts\n\n\nScript syntax: ./downloadupload.sh <SOURCE_STORAGE_ACCOUNT_NAME> <TARGET_STORAGE_ACCOUNT_NAME> \n\nFor example: $ ./downloadupload.sh -s northstorage -t weststorage\n\n"
     exit 1
 fi
 
@@ -53,12 +50,12 @@ fi
 BRK
 
 # Exporting Storage Account variables:
-if [ $(az storage account list -o table | grep ${SOURCESA} | awk '{print $9}') = "available" ]
+if [[ $(az storage account list -o table | grep ${SOURCESA} | awk '{print $9}') = *available ]]
 then export SOURCE_RG=$(az storage account list -o table | grep ${SOURCESA} | awk '{print $8}')
 else export SOURCE_RG=$(az storage account list -o table | grep ${SOURCESA} | awk '{print $9}')
 fi
 
-if [ $(az storage account list -o table | grep ${TARGETSA} | awk '{print $9}') = "available" ]
+if [[ $(az storage account list -o table | grep ${TARGETSA} | awk '{print $9}') = *available ]]
 then export TARGET_RG=$(az storage account list -o table | grep ${TARGETSA} | awk '{print $8}')
 else export TARGET_RG=$(az storage account list -o table | grep ${TARGETSA} | awk '{print $9}')
 fi
