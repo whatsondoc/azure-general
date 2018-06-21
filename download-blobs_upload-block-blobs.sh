@@ -23,8 +23,6 @@ do
     case "${flag}" in
         s | --source)   SOURCESA=$OPTARG ;;
         t | --target)   TARGETSA=$OPTARG ;;
-        h | --help)     print_help
-                        exit 1 ;;
 	esac
 done
 
